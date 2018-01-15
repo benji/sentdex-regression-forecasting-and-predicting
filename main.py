@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import math, datetime, time
-from datetime import datetime
 from sklearn import preprocessing, cross_validation, svm
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
@@ -53,18 +52,16 @@ X_pred30 = X[-forecast_out:]
 y_pred_forecast = clf.predict(X_pred30)
 
 last_date = df.iloc[-1].name
-last_unix = last_date.timestamp()
-one_day = 86400
-next_unix = last_unix + one_day
+dt = datetime.datetime.fromtimestamp(last_date.timestamp())
 
 for i in y_pred_forecast:
-    next_date = datetime.fromtimestamp(next_unix)
-    next_unix += one_day
-    df.loc[next_date] = [np.nan for _ in range(len(df.columns) - 1)] + [i]
+    dt += datetime.timedelta(days=1)
+    df.loc[dt] = [np.nan for _ in range(len(df.columns) - 1)] + [i]
 
-a = df[forecast_col].plot()
-p = df['Prediction'].plot()
+df[forecast_col].plot()
+df['Prediction'].plot()
+
 plt.xlabel('Date')
 plt.ylabel('Price')
-plt.legend(['Actual', 'Prediction'], loc=4)
+plt.legend(['Actual GOOGL stock price', 'Prediction'], loc=4)
 plt.show()
